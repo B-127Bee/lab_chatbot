@@ -8,6 +8,7 @@ import redis
 
 global redis1
 
+
 def main():
     # Load your token and create an Updater for your Bot
     config = configparser.ConfigParser()
@@ -39,12 +40,14 @@ def main():
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("add", add))
     dispatcher.add_handler(CommandHandler("help", help_command))
+    dispatcher.add_handler(CommandHandler("hello", hello))
 
     # To start the bot
     updater.start_polling()
     updater.idle()
 
-def echo(update, context):
+
+def echo(update: Update, context: CallbackContext):
     reply_message = update.message.text.upper()
     logging.info("Update: " + str(update))
     logging.info("Context: " + str(context))
@@ -73,12 +76,20 @@ def add(update: Update, context: CallbackContext) -> None:
     except (IndexError, ValueError):
         update.message.reply_text('Usage: /add <keyword>')
 
+
 def equiped_chatgpt(update, context):
     global chatgpt
     reply_message = chatgpt.submit(update.message.text)
     logging.info("Update: " + str(update))
     logging.info("context: " + str(context))
     context.bot.send_message(chat_id=update.effective_chat.id, text=reply_message)
+
+def hello(update, context):
+    try:
+        logging.info(context.args[0])
+        update.message.reply_text(f'Good day, {context.args[0]}!')
+    except:
+        update.message.reply_text('Usage: /hello <keyword>')
 
 
 if __name__ == '__main__':
