@@ -1,8 +1,10 @@
+import os
+
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from ChatGPT_HKBU import HKBU_ChatGPT
 
-import configparser
+# import configparser
 import logging
 import redis
 
@@ -11,16 +13,17 @@ global redis1
 
 def main():
     # Load your token and create an Updater for your Bot
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    updater = Updater(token=(config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
+    # config = configparser.ConfigParser()
+    # config.read('config.ini')
+    # updater = Updater(token=(config['TELEGRAM']['ACCESS_TOKEN']), use_context=True)
+    updater = Updater(token=(os.environ['ACCESS_TOKEN']), use_context=True)
     dispatcher = updater.dispatcher
     global redis1
-    redis1 = redis.Redis(host=(config['REDIS']['HOST']),
-                         password=(config['REDIS']['PASSWORD']),
-                         port=(config['REDIS']['REDISPORT']),
-                         decode_responses=(config['REDIS']['DECODE_RESPONSE']),
-                         username=(config['REDIS']['USER_NAME']))
+    redis1 = redis.Redis(host=(os.environ['HOST']),
+                         password=(os.environ['PASSWORD']),
+                         port=(os.environ['PORT']),
+                         decode_responses="True",
+                         username="default")
 
     # You can set this logging module, so you will know when
     # and why things do not work as expected Meanwhile, update your config.ini as:
@@ -32,7 +35,7 @@ def main():
 
     # dispatcher for chatgpt
     global chatgpt
-    chatgpt = HKBU_ChatGPT(config)
+    chatgpt = HKBU_ChatGPT()
     chatgpt_handler = MessageHandler(Filters.text & (~Filters.command),
                                      equiped_chatgpt)
     dispatcher.add_handler(chatgpt_handler)
